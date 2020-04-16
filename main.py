@@ -3,11 +3,12 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 # to Download the images and make directory
 import os
+import wget
 
 
 class MangaDownloader():
     def __init__(self, manga=None):
-        self.browser = webdriver.Firefox()
+        self.browser = webdriver.PhantomJS()
         self.manga = manga
         self.initial_chapter = 1
         self.end_chapter = float('inf')
@@ -54,6 +55,7 @@ class MangaDownloader():
         return self.directory
 
     def set_all_page(self):
+        self.browser.maximize_window()
         self.dropdown = self.browser.find_element_by_xpath(
             '/html/body/nav/div/div[3]/ul/li[2]/a')
         self.dropdown.click()
@@ -66,8 +68,10 @@ class MangaDownloader():
             page += 1
             image_src = image.get_attribute('data-src')
             filename = f"{directory}/{page}.png"
-            # Download Images
+            # Download Images using Linux Command
             os.system(f"wget -O {filename} {image_src}")
+            # Download Images using wget
+            # wget.download(image_src, filename)
 
     def navigate(self, chapter):
         self.browser.get(
@@ -83,7 +87,7 @@ class MangaDownloader():
             print(
                 f"Manga : {self.manga}, Chapter : {chapter} Berhasil didownload.")
             return True
-        except NoSuchElementException as exception:
+        except NoSuchElementException:
             print("Chapter tidak ditemukan")
             return False
 
